@@ -268,7 +268,7 @@ def persam_f(args, obj_name, images_path, masks_path, output_path):
             plt.savefig(outfile, format='jpg')
 
         mask_output_path = os.path.join(output_path, test_idx + '.png')
-        cv2.imwrite(mask_output_path, mask_colors)
+        cv2.imwrite(mask_output_path, sum(history_masks))
 
 
 

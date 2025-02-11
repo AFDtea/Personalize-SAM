@@ -38,3 +38,8 @@ _darcs
 data
 work_dirs
 
+#DAVIS Dataset
+/DAVIS
+
+#persam folder
+/persam
