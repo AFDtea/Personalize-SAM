@@ -2,4 +2,6 @@ matplotlib
 tqdm
 numpy
 opencv-python
+timm
+torch
 
