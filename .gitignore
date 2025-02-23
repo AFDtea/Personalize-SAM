@@ -38,8 +38,10 @@ _darcs
 data
 work_dirs
 
-#DAVIS Dataset
-/DAVIS
-
 #persam folder
 /persam_venv
+
+# extracted frames
+/video_reworking/AI_Orchard_Frames
+
+/video_reworking/shaker_frames

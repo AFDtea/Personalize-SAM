@@ -134,3 +134,8 @@ This repo benefits from [Segment Anything](https://github.com/facebookresearch/s
 
 ## Contact
 If you have any question about this project, please feel free to contact zhangrenrui@pjlab.org.cn.
+
+
+## Personal Notes
+Command to run training on Video: 
+python persam_video_f.py --output_path results_video --davis_path "C:/Users/alfdu/Clemson/Junior 2nd Semester/Capstone/PerSAM_training/DAVIS/2017"

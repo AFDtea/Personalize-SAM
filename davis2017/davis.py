@@ -44,10 +44,10 @@ class DAVISTestDataset(Dataset):
                     continue
                 self.videos.append(_video)
                 self.num_frames[_video] = len(os.listdir(path.join(self.image_dir, _video)))
-                _mask = np.array(Image.open(path.join(self.mask_dir, _video, '00000.png')).convert("P"))
+                _mask = np.array(Image.open(path.join(self.mask_dir, _video, '00024.png')).convert("P"))
                 self.num_objects[_video] = np.max(_mask)
                 self.shape[_video] = np.shape(_mask)
-                _mask480 = np.array(Image.open(path.join(self.mask480_dir, _video, '00000.png')).convert("P"))
+                _mask480 = np.array(Image.open(path.join(self.mask480_dir, _video, '00024.png')).convert("P"))
                 self.size_480p[_video] = np.shape(_mask480)
         self.single_object = single_object
 
@@ -65,6 +65,10 @@ class DAVISTestDataset(Dataset):
 
         images = []
         masks = []
+
+        # First, read one mask to use as template
+        template_mask = np.array(Image.open(path.join(self.mask_dir, video, '00024.png')).convert('P'), dtype=np.uint8)
+
         for f in range(self.num_frames[video]):
             img_file = path.join(self.image_dir, video, '{:05d}.jpg'.format(f))
             img = Image.open(img_file).convert('RGB')
@@ -77,7 +81,7 @@ class DAVISTestDataset(Dataset):
                 m = np.array(Image.open(mask_file).convert('P'), dtype=np.uint8) #(480, 910)
                 masks.append(m) #(480, 910), numpy
             else:
-                masks.append(np.zeros_like(masks[0]))
+                masks.append(np.zeros_like(template_mask))
         
         images = np.stack(images, 0)
         masks = np.stack(masks, 0)
@@ -166,10 +170,14 @@ class DAVIS(object):
             yield image, mask
 
     def _get_all_elements(self, sequence, obj_type):
+        print(f"Getting elements for sequence {sequence} and obj_type {obj_type}")
+        print(f"Sequence data: {self.sequences[sequence][obj_type]}")  # See what's in the sequence
+
         obj = np.array(Image.open(self.sequences[sequence][obj_type][0]))
         all_objs = np.zeros((len(self.sequences[sequence][obj_type]), *obj.shape))
         obj_id = []
         for i, obj in enumerate(self.sequences[sequence][obj_type]):
+            print(f"Processing object {i}: {obj}")  # Print current object being processed
             all_objs[i, ...] = np.array(Image.open(obj))
             obj_id.append(''.join(obj.split('/')[-1].split('.')[:-1]))
         return all_objs, obj_id

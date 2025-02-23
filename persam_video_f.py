@@ -24,7 +24,7 @@ def main(args):
     print("Running on DAVIS", args.dataset_set)
     test_dataset = DAVISTestDataset(args.davis_path, imset=args.dataset_set + '/val.txt')
     test_loader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_workers=1)
-    palette = Image.open(path.expanduser(os.path.join(args.davis_path, 'Annotations/480p/bike-packing/00000.png'))).getpalette()
+    # palette = Image.open(path.expanduser(os.path.join(args.davis_path, 'Annotations/480p/bike-packing/00000.png'))).getpalette()
 
     # Load SAM
     sam_type, sam_ckpt = 'vit_h', 'sam_vit_h_4b8939.pth'
@@ -35,6 +35,7 @@ def main(args):
 
     # Start eval
     for iter, data in enumerate(test_loader):
+        print(f"\nStarting iter {iter} of {len(test_loader)}...")
         rgb = data['rgb'].cpu().numpy() 
         msk = data['gt'][0].cpu().numpy()
         info = data['info']
@@ -138,6 +139,8 @@ def main(args):
 
             print('======> Start Training')
             for train_idx in range(train_epochs):
+                if train_idx % 100 == 0:  # Print every 100 epochs
+                    print(f"Training epoch {train_idx}/{args.train_epoch_inside}, Loss: {loss.item():.4f}")
                 masks, scores, logits, logits_high = predictor.predict(
                             point_coords=topk_xy,
                             point_labels=topk_label,
@@ -165,6 +168,7 @@ def main(args):
             mask_weights_list.append(mask_weights)
 
         for i in range (1, frame_num):
+            print(f"Processing frame {i}/{frame_num}...")
             current_img = rgb[0, i] 
             predictor.set_image(current_img)
             test_feat = predictor.features.squeeze() #[256, 64, 64] 
@@ -261,7 +265,7 @@ def main(args):
                 
             current_mask_pred = np.argmax(concat_mask, axis=0).astype(np.uint8)
             output = Image.fromarray(current_mask_pred)
-            output.putpalette(palette)
+            # output.putpalette(palette)
             output.save(save_path + '{:05d}.png'.format(i))
 
             if args.box_prompt:
